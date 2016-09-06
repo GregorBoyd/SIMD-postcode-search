@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+<head>
+	<title> SIMDbot </title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="w3-row-padding">
+	<h1> SIMDbot </h1>
+	<h3> Enter Postcode </h3>
+	
+	<div class="w3-col">
+		<form>
+			<input class="input" type="text" name="Postcode" value="EH1 3DG" id="PostcodeForm" >
+		</form>
+	</div>
+	<br>
+	<br>
+
+	<div class="w3-col">
+		<button onclick="myFunction()" class="button,html"> Get SIMD16! </button>
+	</div>
+	<br>
+	<br>
+
+	<script type="text/javascript">
+	function myFunction() {
+
+		var postcode1 = document.getElementById("PostcodeForm").value;
+		var postcode2 = postcode1.toUpperCase()
+		var postcode3 = "'"+postcode2+"'";
+		var query = "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX qb: <http://purl.org/linked-data/cube#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> SELECT ?DZ ?Rank WHERE {?s rdf:type <http://data.ordnancesurvey.co.uk/ontology/postcode/PostcodeUnit>. ?s rdfs:label " +postcode3+ ". ?s <http://statistics.gov.scot/def/postcode/dataZone2011> ?DZuri. ?DZuri skos:notation ?DZ. ?r <http://purl.org/linked-data/sdmx/2009/dimension#refArea> ?DZuri. ?r qb:dataSet <http://statistics.gov.scot/data/scottish-index-of-multiple-deprivation-2016>. ?r <http://statistics.gov.scot/def/dimension/simdDomain> <http://statistics.gov.scot/def/concept/simd-domain/simd>. ?r <http://purl.org/linked-data/sdmx/2009/dimension#refPeriod> <http://reference.data.gov.uk/id/year/2016>. ?r <http://purl.org/linked-data/cube#measureType> <http://statistics.gov.scot/def/measure-properties/rank>. ?r <http://statistics.gov.scot/def/measure-properties/rank> ?Rank.}";
+
+		$.ajax({
+			method: "POST",
+			dataType: "json",
+			url: "http://statistics.gov.scot/sparql.json",
+			data: {query: query},
+			success: function(data) {
+							var    txt = "<tr><td>"+postcode2+"</td><td><a href='http://statistics.gov.scot/id/statistical-geography/"+data.results.bindings[0].DZ.value+"'>"+data.results.bindings[0].DZ.value+"</a></td><td>"+data.results.bindings[0].Rank.value+"</td></tr>";
+							$("#table").append(txt).removeClass("w3-table");
+			}
+		});
+	};
+	 
+	</script>
+
+	<div class="w3-col">
+		<table id="table" class="w3-table-all">
+			<tr>
+				<th>Postcode</th>
+				<th>Data Zone</th>
+				<th>Rank</th>
+			</tr>
+		</table>
+	</div>
+
+</div>
+
+</body>
+</html>
